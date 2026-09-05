@@ -1,0 +1,131 @@
+\documentclass[12pt,reqno]{amsart}
+\usepackage[margin=1.1in]{geometry}
+
+\usepackage{amsthm}
+
+\usepackage{/Users/taylor/tex/pkg/general}
+\usepackage{/Users/taylor/tex/pkg/fonts}
+\usepackage{/Users/taylor/tex/pkg/colors}
+\usepackage{/Users/taylor/tex/pkg/unicode}
+\usepackage{/Users/taylor/tex/pkg/section}
+\usepackage{/Users/taylor/tex/pkg/theorem}
+
+\renewcommand{\.}{\mspace{1.5mu}}
+\newcommand{\?}{\mspace{-1.5mu}}
+\newcommand{\mdot}{\?\cdot\?}
+
+
+\DUC{03BC}{\mu} 
+\DUC{1D4D0}{\mathscr{A}} 
+
+\renewcommand{\labelitemi}{\raisebox{0.5\height}{\scalebox{0.65}{\textbullet}}}
+\renewcommand{\labelitemii}{\raisebox{0.5\height}{\scalebox{0.65}{$\circ$}}}
+
+% \numberwithin{equation}{section}
+% \numberwithin{figure}{section}
+% 
+% \setlist[enumerate]{
+%     leftmargin=*,
+%     align=left,
+%     label=\textbf{\thesection.\arabic*},
+%     labelindent=0pt
+% }
+
+\newcommand{\Impl}{\Longrightarrow}
+
+\usepackage{eucal}
+\usepackage[scaled=1.15,mathscr]{urwchancal} % Changes mathscr font
+
+
+% Probability things
+% ===========================
+\newcommand{\E}{E}
+\renewcommand{\P}{P} % default \P is paragraph symbol
+\newcommand{\V}{V}
+\DeclareMathOperator{\Cov}{\mathrm{Cov}}
+\DeclareMathOperator{\Corr}{\mathrm{Corr}}
+\DeclareMathOperator{\PV}{\mathrm{PV}}
+
+
+\renewcommand{\c}{\mathbf{c}} % \c{c} gives "cedilla" diacritic
+
+\newcommand{\vocab}[1]{\textbf{{\color{Blue}#1}}}
+\newcommand{\lh}{\left}
+\newcommand{\xS}{\Sigma}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DOCUMENT BEGIN
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\tableofcontents
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{definition}
+    We are discussing a Bond with the following terms:
+    \begin{itemize}
+        \item $A =$ \emph{par value}, the amount paid at maturity;
+        \item $n =$ number of compounding periods \underline{per year};
+        \item $T$ is the number of years \emph{remaining} to maturity;
+            \begin{itemize}[itemindent=0pt]
+                \item $N:=nT$ is the \emph{total} number of compounding periods. 
+            \end{itemize}
+        \item $Y$ is the \underline{annual} ``desired/prevailing\footnotemark'' rate of return (a.k.a.~the \emph{yield to maturity}) %
+        \footnotetext{We can assume this is the \emph{risk-free rate}.} %
+            \begin{itemize} 
+                \item $y := Y/n$ is the per-period rate of return. 
+            \end{itemize}
+        \item $R$ is the \emph{annual} coupon rate; 
+            \begin{itemize} 
+                \item $ρ := R/n$ is the \emph{per-period} coupon rate.
+            \end{itemize}
+    \end{itemize}
+    Finally, we let $P := P(ρ, y, N)$ be the \emph{current} price of the bond.
+\end{definition}
+
+We may derive (see below) that
+    \(
+        P(ρ, y, N) = A + A\big(\tfrac{ρ}{y}-1\big)\big(1-(1+y)^{-N}\big).  
+    \)
+
+
+\vspace{3\baselineskip}
+% ===============================================
+\subsection{Derivation}
+
+If $y = Y/n$ is the ``prevailing'' per-period rate for the class of Bond, then the per-period \emph{discount factor} is
+    \[
+        𝜈 := (1 + Y/n) = (1 + y).
+    \]
+With this, the present value of the coupon payments (each of size $Aρ$) and the present value of the face value are
+    \[
+        \PV(\text{coupons}) + \PV(\text{Par}) = 
+        Aρ(𝜈^{-1} + \cdots + 𝜈^{-N}) + A𝜈^{-N} = Aρ\mdot\fr{1-𝜈^{-N}}{𝜈(1-𝜈^{-1})} + A𝜈^{-N}.
+    \]
+Simplifying and using the fact that $𝜈-1 = y$, we arrive at the formula
+    \[
+        P = A + A\Big(\frac{ρ}{y}-1\Big)\big(1-(1+y)^{-N}\big)  
+    \]
+% ===============================================
+\subsection{Extra/Side Notes}
+
+\begin{enumerate}
+    \item In the context of Bonds, the coupon rate is taken to be \underline{constant} for the life of the Bond.
+\end{enumerate}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DOCUMENT END
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

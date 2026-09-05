@@ -1,0 +1,3 @@
+\contentsline {section}{\tocsection {}{1}{Summary}}{1}{section.1}%
+\contentsline {subsection}{\tocsubsection {}{1.1}{Derivation}}{1}{subsection.1.1}%
+\contentsline {subsection}{\tocsubsection {}{1.2}{Extra/Side Notes}}{1}{subsection.1.2}%

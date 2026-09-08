@@ -1,0 +1,25 @@
+<entry xmlns="http://www.w3.org/2005/Atom">
+<title type="text"></title>
+<updated>2026-09-05T02:20:27Z</updated>
+<author><name /></author>
+<category term="TreasuryDataWarehouseModel.DailyTreasuryYieldCurveRateDatum" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme" />
+<content type="application/xml">
+<m:properties xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata">
+<d:NEW_DATE xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.DateTime">2024-11-19T00:00:00</d:NEW_DATE>
+<d:BC_1MONTH xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.67</d:BC_1MONTH>
+<d:BC_2MONTH xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.63</d:BC_2MONTH>
+<d:BC_3MONTH xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.62</d:BC_3MONTH>
+<d:BC_4MONTH xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.51</d:BC_4MONTH>
+<d:BC_6MONTH xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.44</d:BC_6MONTH>
+<d:BC_1YEAR xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.34</d:BC_1YEAR>
+<d:BC_2YEAR xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.27</d:BC_2YEAR>
+<d:BC_3YEAR xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.24</d:BC_3YEAR>
+<d:BC_5YEAR xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.25</d:BC_5YEAR>
+<d:BC_7YEAR xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.32</d:BC_7YEAR>
+<d:BC_10YEAR xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.39</d:BC_10YEAR>
+<d:BC_20YEAR xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.66</d:BC_20YEAR>
+<d:BC_30YEAR xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.57</d:BC_30YEAR>
+<d:BC_30YEARDISPLAY xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">4.57</d:BC_30YEARDISPLAY>
+</m:properties>
+</content>
+</entry>

@@ -1,14 +1,3 @@
-import re, json, requests
-from urllib.parse import urlencode
-
-BASE_URL = "https://home.treasury.gov"
-ENDPOINT = "/resource-center/data-chart-center/interest-rates/pages/xml"
-
-# list of maturities we want
-months = [1,2,3,4,6];
-years = [1,2,3,5,7,10,20,30];
-maturity_strs = [ f"{i}MONTH" for i in months ]
-maturity_strs.extend([ f"{i}YEAR" for i in years ])
 
 # =====================================
 def parse_props(prop_str):
@@ -39,7 +28,7 @@ def main():
   response.raise_for_status()
 
   XML=response.content.decode()
-  with open('test.txt', 'w') as file:
+  with open('../../misc/test.txt', 'w') as file:
     file.write(XML)
 
   PROPS_ALL=re.findall(r"<m:properties>(.*?)</m:properties>", XML, re.S)
@@ -48,7 +37,7 @@ def main():
   for prop_str in PROPS_ALL:
     PARS.append(parse_props(prop_str))
 
-  with open("test_xml.json", 'w') as file:
+  with open("../../misc/test_xml.json", 'w') as file:
     json.dump(PARS, file)
 
 if __name__ == "__main__":

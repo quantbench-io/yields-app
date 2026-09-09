@@ -18,16 +18,6 @@ app.add_middleware(
 )
 app.frontend("/", directory=static_html_path)
 
-# ===============================================
-BASE_URL = "https://home.treasury.gov"
-ENDPOINT = "/resource-center/data-chart-center/interest-rates/pages/xml"
-
-# list of maturities we want
-months = [1,2,3,4,6];
-years = [1,2,3,5,7,10,20,30];
-maturity_strs = [ f"{i}MONTH" for i in months ]
-maturity_strs.extend([ f"{i}YEAR" for i in years ])
-
 
 # ===============================================
 @app.get("/api/v1/scores/{maximum}")
@@ -40,21 +30,18 @@ async def get_scores(maximum: int) -> list[float]:
 
 
 # ===============================================
-@app.get("/api/v1/zeros/{date}")
-async def get_zeros(date: int) -> list[float]:
-    result = await get_pars(date)
-    return result
+@app.get("/api/v1/yieldcurve/{date}")
+async def get_yield_curve(date: str):
+    par_yields = get_pars(date)
+    if par_yields == [] :
+        return {"date": f"{date} does not have data.", "pars": [], "zeros": []}
 
-#
-# # =====================================
-# # MAIN
-# # =====================================
-# def main():
-#
-#   with open('misc/test.txt', 'w') as file:
-#     file.write(XML)
-#
-#   with open("misc/test_xml.json", 'w') as file:
-#     json.dump(PARS, file)
-#
+    R_t, D_t = bootstrap_D_from_par_yields(par_yields, freq=2, returnR=True, percentize=True)
 
+    _t = [t for t, _ in par_yields]
+    D_nodes = [(t, d) for t, d in D_t if t in _t]
+    D_log = log_interpolate_Dm(D_nodes)
+    Z_log = D_to_Zc(D_log)
+    Z_log = [(t,100*z) for t,z in Z_log] # to percent
+
+    return {"date": date, "pars": par_yields, "zeros": Z_log}

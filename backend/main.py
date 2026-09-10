@@ -1,6 +1,6 @@
 import os, time, asyncio
 from backend.tools import *
-from backend.pars_get import *
+from backend.get_pars import *
 
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware

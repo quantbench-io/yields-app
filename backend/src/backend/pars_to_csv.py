@@ -7,7 +7,7 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 # this is basically all the functions, but okay for now
-from pars_get import (
+from get_pars import (
     get_pars,
     get_latest_pars,
     get_pars_xml,

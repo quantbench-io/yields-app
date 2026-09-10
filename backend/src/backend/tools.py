@@ -117,30 +117,6 @@ def bootstrap_D_from_R(R_t, freq):
     return [*D_short, *(D_long[1:])]
 
 
-
-
-
-
-
-
-
-# ===============================================
-# the "main" function
-def bootstrap_D_from_par_yields(par_nodes, freq=2, returnR=False, percentize=True):
-    # freq is the number of coupon payments per year.
-    if percentize:
-        nodes = [(t, R/100) for t, R in par_nodes]
-
-    nodes_t = [t for t, r in nodes]
-
-    R_t = interpolate_R(nodes, freq, mode="lin")
-    D_t = bootstrap_D_from_R(R_t, freq)
-
-    if returnR : return R_t, D_t
-    else : return D_t
-
-
-
 # ===============================================
 # conversions of discounts to zero rates
 
@@ -162,3 +138,39 @@ def Zm_to_Zc(Zm_t, freq):
     # converts m-times-annually compounding rates into annual continuous zero-rates
     m = freq;
     return [(t, m*np.log(1+zm_t/m)) for t, zm_t in Zm_t]
+
+
+# ===============================================
+# the "main" functions
+def bootstrap_D_from_par_yields(par_nodes, freq=2, returnR=False, percentize=True):
+    # freq is the number of coupon payments per year.
+    if percentize:
+        nodes = [(t, R/100) for t, R in par_nodes]
+
+    nodes_t = [t for t, r in nodes]
+
+    R_t = interpolate_R(nodes, freq, mode="lin")
+    D_t = bootstrap_D_from_R(R_t, freq)
+
+    if returnR : return R_t, D_t
+    else : return D_t
+
+# nice wrapper for the main logic
+def zeros_from_pars(par_yields, freq=2):
+    R_t, D_t = bootstrap_D_from_par_yields(
+        par_yields, freq, returnR=True, percentize=True
+    )
+
+    # conversions and interpolations
+    _t = [t for t, _ in par_yields]
+    D_nodes = [(t, d) for t, d in D_t if t in _t]
+
+    Z_nodes = D_to_Zc(D_nodes)
+    Z_nodes = [(t,100*z) for t,z in Z_nodes] # percent
+
+    # for plotting "continuous zero curve"
+    D_log = log_interpolate_Dm(D_nodes)
+    Z_log = D_to_Zc(D_log)
+    Z_log = [(t,100*z) for t,z in Z_log] # percent
+
+    return D_nodes, Z_nodes, Z_log

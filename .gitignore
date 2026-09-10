@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+data/csv/*
+data/xml/*
+**/.ipynb_checkpoints
+**/__pycache__/*
+backend/__pycache__/*

@@ -47,10 +47,10 @@ def interpolate_f(nodes, mode):
     return np.vectorize(_f)
 
 
-def interpolate_R(par_yields, freq, mode):
+def interpolate_R(par_nodes, freq, mode):
 
     t_short, t_long = [], []
-    for t, R in par_yields :
+    for t, R in par_nodes :
         if t <= 0.5 : t_short.append(t)
         elif t >= 0.5 : t_long.append(t) # convenient to keep 0.5 in both
 
@@ -58,7 +58,7 @@ def interpolate_R(par_yields, freq, mode):
     tt_long = np.linspace(0.5, int(t_long[-1]), int(freq*t_long[-1]))
     tt = [*tt_short, *(tt_long[1:])]
 
-    R_interpolate = interpolate_f(par_yields, mode)
+    R_interpolate = interpolate_f(par_nodes, mode)
     RR = R_interpolate(tt)
 
     return list(zip(tt, RR))
@@ -142,7 +142,7 @@ def Zm_to_Zc(Zm_t, freq):
 
 # ===============================================
 # the "main" functions
-def bootstrap_D_from_par_yields(par_nodes, freq=2, returnR=False, percentize=True):
+def bootstrap_D_from_par_nodes(par_nodes, freq=2, returnR=False, percentize=True):
     # freq is the number of coupon payments per year.
     if percentize:
         nodes = [(t, R/100) for t, R in par_nodes]
@@ -156,13 +156,13 @@ def bootstrap_D_from_par_yields(par_nodes, freq=2, returnR=False, percentize=Tru
     else : return D_t
 
 # nice wrapper for the main logic
-def zeros_from_pars(par_yields, freq=2):
-    R_t, D_t = bootstrap_D_from_par_yields(
-        par_yields, freq, returnR=True, percentize=True
+def zeros_from_par_nodes(par_nodes, freq=2):
+    R_t, D_t = bootstrap_D_from_par_nodes(
+        par_nodes, freq, returnR=True, percentize=True
     )
 
     # conversions and interpolations
-    _t = [t for t, _ in par_yields]
+    _t = [t for t, _ in par_nodes]
     D_nodes = [(t, d) for t, d in D_t if t in _t]
 
     Z_nodes = D_to_Zc(D_nodes)

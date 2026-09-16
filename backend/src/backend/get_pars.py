@@ -1,9 +1,13 @@
 import re, time, json, requests
+import sqlite3 as sql
+import os
+
 from urllib.parse import urlencode
 
 # ===============================================
 BASE_URL = "https://home.treasury.gov"
 ENDPOINT = "/resource-center/data-chart-center/interest-rates/pages/xml"
+DB_FILE = "./data/par_yields_all.db"
 
 # list of maturities we want
 months = [1,2,3,4,6];
@@ -62,8 +66,7 @@ def parse_pars(xml: str):
 
 
 # =====================================
-def lookup_par_date(date:str, DB:str):
-
+def lookup_par_ser_date(date:str, DB:str) -> list:
     conn = sql.connect(DB)
     cur = conn.cursor()
 
@@ -75,15 +78,9 @@ def lookup_par_date(date:str, DB:str):
     conn.close()
 
     if fetched == []:
-        return {date: []}
+        return []
     else:
-        _out = {}
-        for row in fetched:
-            _date = row[0]
-            ser = row[1:]
-            _out[_date] = list(zip(TAUS, ser))
-
-    return _out
+        return list(zip(TAUS, fetched[0][1:]))
 
 def more_than_a_week(date: str) -> bool:
     """
@@ -104,23 +101,30 @@ def more_than_a_week(date: str) -> bool:
 # =====================================
 def get_pars(date: str):
 
+    print(os.getcwd())
     # check if DB_FILE has data for date
-    DB_FILE = "/Users/taylor/yields-app/backend/data/par_yields_all.db"
-    pars_data = lookup_par_date(date, DB_FILE)
+    pars_ser = lookup_par_ser_date(date, DB_FILE)
+
+    # No published data for 2010-10-11, yet appears in Treasury files;
+    # will drop this row from SQL table later
+    if date=="2010-10-11" : return []
+
+
+    if pars_ser != [] :
+        return pars_ser
 
     # if there is no data and it's been 7 days,
     # conclude that the date wasn't a trading day
-    # OR the date was 2010-10-11, which has no published data
-    if (pars_data.get(date) == []) and more_than_a_week(date) :
-        return pars_data
+    elif more_than_a_week(date) :
+        return []
 
-    # otherwise, try to pull it down
-    # no updates to DB at the moment.
+    # otherwise, try to pull it down.
+    # (no update DB function at the moment)
+    else:
+        xml = get_pars_xml(date, mode="month")
+        pars_data = parse_pars(xml)
 
-    xml = get_pars_xml(date, mode="month")
-    pars_data = parse_pars(xml)
-
-    return pars_data.get(date, [])
+        return pars_data.get(date, [])
 
 # =====================================
 def get_latest_pars():

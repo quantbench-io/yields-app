@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Definitions and Methods</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+<style>
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    max-width: 700px;
+    margin: 2em auto;
+    padding: 0 1em;
+    line-height: 1.4;
+    color: #1a1a1a;
+    background: #ffffff;
+  }
+  h1 { font-size: 1.6em; margin-bottom: 0.3em; }
+  h2 { font-size: 1.2em; margin-top: 1.6em; margin-bottom: 0.4em; }
+  table { border-collapse: collapse; width: 100%; margin: 0.8em 0; }
+  th, td { border: 1px solid #ccc; padding: 4px 8px; text-align: left; font-size: 0.95em; }
+  th { background: #f5f5f5; }
+  li { margin-bottom: 0.4em; }
+</style>
+</head>
+<body>
+
+<div id="content">Loading&hellip;</div>
+
+<script type="text/markdown" id="markdown-source">
+# Definitions and Methods
+
+Notation, formulas, and the resolved points of confusion from our conversation.
+## Notation
+
+| Symbol | Definition |
+|---|---|
+| $P_τ$ | *Price* of \$1, to be paid in $τ$ years (aka the *present value* or *discount factor*) |
+| $τ$ | *Year-fraction* (we assume "now" is $t=0$ ); day-count specified per convention below |
+| $I$ | "Investment Rate" (defined below) |
+
+
+
+<!--| $d_τ$ | "*Bank discount rate*", the Bill's own auction/secondary-market quote |-->
+<!--| $R_τ$ | Investment Rate = Coupon/Bond-Equivalent Yield |-->
+<!--| $Z_τ$ | Annually-compounded zero rate |-->
+<!--| $Z_τ^{(2)}$ | Semiannually-compounded zero rate |-->
+
+
+#### Discount/Present Value Models
+| Name | $P=P(r,τ)$ |
+| --- | --- |
+| "Discount" basis | $P = 1-rτ$ |
+| Annual compounding | $P = (1+r)^{-τ}$ |
+| $m$ times annual compounding | $P = (1+\tfrac{r^{(m)}}{m})^{-mτ}$ |
+| Continuous discounting | $P=e^{-rτ}$ |
+
+## Pricing T-Bills in different conventions
+
+Treasury Bills have maturities of less than one year, i.e., of $τ<1$. T-Bill prices
+are stated in the "*bank/discount basis*", where the stated "price" is the quantity $d$ such that
+
+$$
+P = 1 - d\,\tau_{360} \quad (\tau_{360}\text{ is }\tfrac{\mathrm{Act}}{360}).
+$$
+
+The Treasury's stated *Investment Rate*[^5] $I=I_{τ}$ for a Bill with maturity[^4] $τ<1$ satisfy
+
+|Tau|$P$|Day|
+|---|---|---|
+|$\tau \leq 1/2$|P=|Act/y|
+|$\tau \geq 1/2$|P=|Act/y|
+
+$$
+P_τ = \begin{cases}
+(1+I\tau)^{-1} & 0 < τ ≤ ½, \\
+\big\{(1+(\tau-½)I)(1+½I)\big\}^{-1} & ½ ≤ τ < 1
+\end{cases}
+$$
+
+[^4]: There is a special convention for defining $τ$ in this context. Specifically, per the Treasury, $τ:=r/y$,
+where $r$ is the number of (actual) days to maturity, and $y:=365$ unless "the one-year period,
+measured from the date of issue, contains a date of February 29th", in which case $y:=366$
+
+
+## Treasury Bond Terminology
+
+**Note:** Usually one assumes that the number of compounding periods per year, denoted $m$, is equal to the number of
+coupon *payments*, denoted $k$. However, this isn't necessary; one could get semiannual payments but use a continuous
+discounting model for them. Important to keep terms straight.
+
+US Treasury bonds have maturities $\tau \geq 1$ (not distinguishing between "Notes" and "Bonds" here), and have semiannual
+*coupon* payments, with the first payment arriving 6 months after issue, and the last coupon payment arriving at maturity
+(along with the Par/Face value).
+
+Often the bond states the annual *coupon rate* $C$, which indicates that the semiannual
+coupon payments are $½AC$, where $A$ is the Par value. As usual, we set $A=1$.
+
+Suppose that the bond matures in $n$ *years*. If one sets "1 period" to be 6 months,
+and assumes a *constant* interest rate for *semiannual* compounding, then the total number of periods is $N:=2n$, and the
+*yield to maturity* $Y$ is the constant such that
+
+$$
+\mathrm{Price(Bond)} = ½C(1+Y/2)^{-1} + ½C(1+Y/2)^{-2} + \cdots + ½C(1+Y/2)^{-2N} + 1*(1+Y/2)^{-2N}.
+$$
+
+In this case $Y$ is the APR. Alternatively, one can use the "period" to be "1 year" and
+report the $Y$ for *annual compounding*,  such that
+
+$$
+\mathrm{Price(Bond)} = ½C(1+Y)^{-½} + ½C(1+Y)^{-1} + \cdots + ½C(1+Y)^{-N} + 1*(1+Y)^{-N} \qquad (N:=1n),
+$$
+
+in which case $Y$ is the *APY*.
+
+### Price
+
+Unwinding the above equation, if one sets
+
+$$
+\nu := (1+Y/2)^{-2} \qquad \text{or} \qquad \nu := (1+Y)^{-1},
+$$
+
+depending on the context, may solve the resulting equation
+
+$$
+\mathrm{Price(Bond)} =
+$$
+
+---
+
+### Duration
+
+Suppose an investment consists of cash flows $C_1, \ldots, C_n$ at times $τ_1, \ldots, τ_{n}$ in future—in the case of a bond,
+the last cash flow $C_n$ would include both coupon and face value. Using present value factors $P_i = P(τ_{i})$ all sharing some common rate $r$, then the price of the bond is
+
+$$
+P(r) = C_{1}P_1 + \cdots + C_{n}P_n,
+$$
+
+the (*Macaulay*) *duration* of the bond is
+
+$$
+D_M = D_M(r) = \frac{C_1P_1τ_1 + \cdots + C_{n}P_n τ_n}{C_{1}P_1 + \cdots + C_{n}P_n}
+$$
+
+(which is just a convex combination times $\tau_i$ ) and the *modified duration* is
+
+$$
+	D_{\mathrm{mod}}(r) := -\frac{1}{P}\,\frac{dP}{dr} .
+$$
+
+---
+
+### Bootstrapping zero/spot rates from par yields.
+
+<span: style="color:red">Note:</span> For this section we work with periods of 6 months, we write $P_{1}$ to mean
+the discount factor for the first period of 6 months. Thus, a bond maturing in 18 months will have cash
+payments at $\tau = 1, 2, 3$ (rather than $\tau = 1/2, 1, 3/2$)
+
+If bonds maturing in 6, 12, and 18 months have par yields[^6] $χ_1$, $χ_2$, and $χ_3$
+
+$$
+\begin{align*}
+(1+χ_1)P_1 &= 1 \\
+χ_2P_1 + (1+χ_2)P_2 &= 1 \\
+χ_3P_1 + χ_3P_2 + (1+χ_3)P_3 &=1 \\
+χ_4P_1 + χ_4P_2 + χ_4P_3 + (1+χ_4)P_4 & 1 \\
+\cdots &= \cdots
+\end{align*}
+$$
+
+If the cash flows are equally spaced, *twice-annual* coupon payments of $C=χ_{i}$,
+(thus $2χ_{i}$ per year), and the Par value of the bond is $\$1$, then
+
+$$
+P_{k} = \frac{1-χ_{k}(P_{1}+\cdots+P_{k-1})}{1+χ_{k}}
+$$
+
+[^6]: This is the annual coupon rate that should be paid to make the price of a $\$1$-face bond have price $\$1$
+
+---
+
+## Primary sources
+
+- TreasuryDirect — [Understanding Pricing and Interest Rates](https://treasurydirect.gov/marketable-securities/understanding-pricing/)
+- 31 CFR Appendix B to Part 356, Section VI — [Purchase Price, Discount Rate, and Investment Rate for T-Bills](https://www.ecfr.gov/current/title-31/subtitle-B/chapter-II/subchapter-A/part-356/appendix-Appendix%20B%20to%20Part%20356)
+- Treasury — [Treasury Yield Curve Methodology](https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/treasury-yield-curve-methodology)
+- Treasury — [Interest Rates FAQ](https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/interest-rates-frequently-asked-questions)
+- Treasury — [Daily Treasury Bill Rates (Coupon-Equivalent definition)](https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_bill_rates&field_tdr_date_value=2026)
+</script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/marked@latest/lib/marked.umd.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/marked-katex-extension@latest/lib/index.umd.js"></script>
+<script defer>
+  document.addEventListener('DOMContentLoaded', () => {
+    const markdownSource = document.getElementById('markdown-source').textContent;
+    marked.use(markedKatex({ throwOnError: false }));
+    document.getElementById('content').innerHTML = marked.parse(markdownSource);
+  });
+</script>
+
+</body>
+</html>

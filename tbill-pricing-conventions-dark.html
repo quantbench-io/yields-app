@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="./example.css" />
+<title>T-Bill Pricing Conventions — Reference (Night Mode)</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$']], displayMath: [['\\[', '\\]']] },
+    options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+  };
+</script>
+<!--<script>MathJax = {tex: {inlineMath: {'[+]': [['$','$']]}}};</script>-->
+<!--<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>T-Bill Pricing: Conventions Cheat-Sheet</h1>
+  <div class="subtitle">Notation, formulas, and the resolved points of confusion from our conversation.</div>
+
+  <h2>Notation</h2>
+  <div class="notation-grid">
+    <div>$P_τ$</div><div>Price of \$1, to be paid in $τ$ years (aka the <i>discount factor</i>)</div>
+    <div>$τ$</div><div><i>Year-fraction</i> to maturity; day-count specified per convention below</div>
+    <div>$d_τ$</div><div>"<i>Bank discount rate</i>", the Bill's own auction/secondary-market quote</div>
+    <div>$R_τ$</div><div>
+      Investment Rate = Coupon-Equivalent Yield = Bond-Equivalent Yield
+      = Investment Yield (all one quantity, per Treasury's own naming)
+      </div>
+    <div>$Z_τ$</div><div>Annually-compounded zero rate</div>
+    <div>$Z_τ^{(2)}$</div><div>Semiannually-compounded zero rate</div>
+  </div>
+
+  <h2>The conventions, side by side</h2>
+  <table>
+    <tr>
+      <th>Convention</th>
+      <th>Defining equation for $P_τ$</th>
+      <th>Day count</th>
+      <th>Base</th>
+    </tr>
+    <tr>
+      <td>Bank discount</td>
+      <td>$P = 1 - d\,τ_{360}$</td>
+      <td>Act/360</td>
+      <td>face ($1)</td>
+    </tr>
+    <tr>
+      <td>Investment Rate<br><span style="color:var(--muted); font-weight:400;">($τ \le \tfrac12$ yr)</span></td>
+      <td>$P = (1 + Rτ)^{-1}$</td>
+      <td>Act/365 or 366</td>
+      <td>price (P)</td>
+    </tr>
+    <tr>
+      <td>Investment Rate<br><span style="color:var(--muted); font-weight:400;">($τ > \tfrac12$ yr)</span></td>
+      <td>$P = \left[(1+(τ-\tfrac12)R)(1+\tfrac{R}{2})\right]^{-1}$</td>
+      <td>Act/365 or 366</td>
+      <td>price (P)</td>
+    </tr>
+    <tr>
+      <td>Annual compounding</td>
+      <td>$P = (1 + Z)^{-τ}$</td>
+      <td>(your choice)</td>
+      <td>price (P)</td>
+    </tr>
+    <tr>
+      <td>Semiannual compounding</td>
+      <td>$P = (1 + Z^{(2)}/2)^{-2τ}$</td>
+      <td>(your choice)</td>
+      <td>price (P)</td>
+    </tr>
+  </table>
+  <p class="note">The two Investment-Rate rows are <em>continuous</em> at $τ = \tfrac12$ — both reduce to $P(1+R/2)=1$ exactly at the seam, so there's no ambiguity right at 6 months.</p>
+
+  <h2>Worked examples we ran</h2>
+  <div class="example-box">
+    <div class="label">13-week bill, P = 0.85</div>
+    d ≈ 59.34% &nbsp;|&nbsp; R ≈ 70.78% &nbsp;|&nbsp; Z ≈ 91.91% &nbsp;|&nbsp; $Z^{(2)}$ ≈ 77.06%
+  </div>
+  <div class="example-box">
+    <div class="label">90-day bill, P = 0.997</div>
+    d = 1.200% &nbsp;|&nbsp; R ≈ 1.2203% &nbsp;(bridge formula confirmed match)
+  </div>
+  <div class="example-box">
+    <div class="label">Published $R_{90}$ = 4.3% (90-day CMT point)</div>
+    $P = (1+0.043\times 90/365)^{-1} \approx 0.989505$ &nbsp;→&nbsp; Price ≈ $98.9505 / $100
+  </div>
+  <div class="example-box">
+    <div class="label">Published $R_{182}$ = 4.3% (6-month CMT point)</div>
+    $τ = \tfrac12$ exactly → $P = (1+0.043/2)^{-1} \approx 0.978953$ &nbsp;→&nbsp; Price ≈ $97.8953 / $100. It's a <strong>bill</strong> (26-week), not a bond.
+  </div>
+
+  <h2>Key confusions we resolved</h2>
+  <ul>
+    <li><strong>$d_τ$ and $R_τ$ are different rates</strong> f
+      or the same $P_τ$ — not two formulas competing for the same quantity.
+      Discount rate is off face, act/360; investment rate is off price, act/365.
+    </li>
+    <li><strong>$R_τ$ itself has two regimes</strong>
+      ($τ \le \tfrac12$ vs $τ > \tfrac12$ year), because it mirrors how a real semiannual bond accrues:
+      compound only at whole coupon dates, simple-interest any partial stub. Under ½ year, there's no whole period to compound — hence pure simple interest.
+    </li>
+    <li><strong>The published CMT / Daily Par Yield Curve number, even at bill maturities, is $R_τ$</strong>
+      (not $d_τ$, not $Z_τ^{(2)}$) — Treasury explicitly converts bill discount rates to bond-equivalent yields before using them as curve inputs.
+    </li>
+    <li><strong>"Yield" is overloaded</strong>:
+      a "CMT yield" is a <em>nominal</em> annual rate under semiannual-compounding convention,
+      reported "on a simple annualized basis" — not an effective/compounded return. Converting it to a true APY requires $(1+I/2)^2 - 1$.
+    </li>
+  </ul>
+
+  <h2>Primary sources</h2>
+    <ul class="sources">
+      <li>TreasuryDirect —
+        <a href="https://treasurydirect.gov/marketable-securities/understanding-pricing/">
+          Understanding Pricing and Interest Rates
+        </a>
+      </li>
+      <li>31 CFR Appendix B to Part 356, Section VI —
+        <a href="https://www.ecfr.gov/current/title-31/subtitle-B/chapter-II/subchapter-A/part-356/appendix-Appendix%20B%20to%20Part%20356">
+          Purchase Price, Discount Rate, and Investment Rate for T-Bills
+        </a>
+      </li>
+      <li>Treasury —
+        <a href="https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/treasury-yield-curve-methodology">
+          Treasury Yield Curve Methodology
+        </a>
+      </li>
+      <li>Treasury —
+        <a href="https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/interest-rates-frequently-asked-questions">
+          Interest Rates FAQ
+        </a>
+      </li>
+      <li>Treasury —
+        <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_bill_rates&field_tdr_date_value=2026">
+          Daily Treasury Bill Rates (Coupon-Equivalent definition)
+        </a>
+      </li>
+    </ul>
+
+</div>
+</body>
+</html>

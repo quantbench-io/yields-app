@@ -1,0 +1,22 @@
+:root {
+    --p-margin: 1.0em;
+}
+
+body {
+    margin: auto;
+    max-width: 900px;
+    align-content: center;
+}
+
+p {
+    margin: calc(var(--p-margin)/4) 0;
+}
+
+details.math-details summary {
+    cursor: pointer;
+}
+
+mjx-container[display] {
+    text-align: left !important;
+    margin: 0 auto 0 3.0em !important;
+}

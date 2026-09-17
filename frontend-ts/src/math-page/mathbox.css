@@ -1,0 +1,53 @@
+:root {
+    --surface-border: #dedad2;
+    --ink: #232220;
+    --ink-muted: #6b675f;
+    --math-rule: #7a5cff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #16171d;
+        --surface-border: #3a3733;
+        --ink: #e9e6df;
+        --ink-muted: #a39e93;
+        --math-rule: #a58bff;
+        background: var(--bg);
+    }
+}
+
+details.math-details {
+    font-family: Charter, 'Bitstream Charter', Georgia, serif;
+    max-width: 36em;
+    padding: 0.75em 0;
+    border-top: 1px solid var(--surface-border);
+    border-bottom: 1px solid var(--surface-border);
+    color: var(--ink);
+}
+
+details.math-details summary {
+    cursor: pointer;
+    color: var(--ink-muted);
+    padding-bottom: 0.25em;
+}
+
+details.math-details summary:hover {
+    color: var(--ink);
+}
+
+details.math-details > *:not(summary) {
+    margin-top: 0.85em;
+    line-height: 1.55;
+}
+
+/* Display (block) math: left-align instead of MathJax's default
+   centering, and indent it slightly so it reads as a distinct
+   block within the surrounding prose. !important is needed because
+   MathJax's own stylesheet sets text-align: center on this element,
+   and it's injected after page CSS. */
+details.math-details mjx-container[display="true"] {
+    text-align: left !important;
+    margin: 1em 0 1em 1.5em;
+    padding-left: 0.75em;
+    border-left: 2px solid var(--math-rule);
+}

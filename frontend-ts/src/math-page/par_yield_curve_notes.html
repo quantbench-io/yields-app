@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Par Yield Curve to Zero Rates</title>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" id="MathJax-script"
+        async></script>
+    <style>
+        body {
+            background: #fafaf8;
+            color: #222;
+            font-family: Georgia, 'Times New Roman', serif;
+            line-height: 1.45;
+            max-width: 720px;
+            margin: 2em auto;
+            padding: 0 1.5em;
+            font-size: 16px;
+        }
+
+        h3,
+        h4,
+        h5 {
+            font-family: Georgia, serif;
+            color: #1a1a1a;
+            margin-top: 1.4em;
+            margin-bottom: 0.4em;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 0.2em;
+        }
+
+        h4 {
+            font-size: 1.1em;
+        }
+
+        h5 {
+            font-size: 1em;
+            font-style: italic;
+        }
+
+        p {
+            margin: 0.6em 0;
+        }
+
+        ol {
+            margin: 0.6em 0;
+            padding-left: 1.4em;
+        }
+
+        ol li {
+            margin: 0.3em 0;
+        }
+
+        .eq {
+            overflow-x: auto;
+            margin: 0.6em 0;
+            text-align: center;
+        }
+
+        strong {
+            color: #111;
+        }
+
+        em {
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <p>Given the <i>par yields</i> $R_{\tau_{1}}, R_{\tau_{2}}, \ldots R_{\tau_{N}}$ for Treasury securities, our goals are:</p>
+    <ol>
+        <li>Select an appropriate interpolation method to infer/compute values $R_{\tau}$ for all $\tau_{1} ≤ \tau ≤ \tau_{N}$;</li>
+        <li>Use the curve $R_{\tau}$ (with $\tau_{1} ≤ \tau ≤ \tau_{N}$) to iteratively compute the "zero-coupon" <i>discount factors</i> (or "price factors")
+            <div class="eq">\[ P_{\tau_{1}}, P_{\tau_{2}}, \ldots, P_{\tau_{N}}; \]</div>
+        in particular, $P_{\tau}$ is the cash price of receiving \$1 $\tau$ years in the future.
+        </li>
+        <li>Interpolate (using some selected method) the values $(P_{\tau_{1}}, \ldots, P_{\tau_{N}})$ to produce a "curve" $P_{\tau}$ for $\tau_{1} ≤ \tau ≤ \tau_{N}$.</li>
+        <li>Map the values $P_{\tau}$ to "<i>zero/spot rates</i>" $Z_{\tau}$ under a predetermined discounting scheme.
+        </li>
+    </ol>
+
+    <h5>For T-Bills ($\tau ≤ \tfrac{1}{2}$)</h5>
+    <!-- =================================== -->
+    <p>Treasury bills have $\tau ≤ \tfrac{1}{2}$ and have no coupon payments; for these, the Treasury publishes the "Bond-Equivalent Rates", which correspond to zero-coupon prices directly via</p>
+        <div class="eq">\[ P_{\tau} = (1 + R_{\tau}\tau)^{-1}. \]</div>
+
+    <h5>For T-Notes and T-Bonds ($\tau ≥ 1$)</h5>
+
+    <p>To handle Treasury <i>Notes</i> and <i>Bonds</i>, which have $\tau ≥ 1$ and have semiannual coupon payments (which we assume are reinvested), to simplify our notation we change our unit of time to be</p>
+        <div class="eq">\[ 1\text{ period} := 6\text{ months}, \]</div>
+    <p>so that a bond maturing in 18 months has cash flows at times $t=1, 2, 3$.</p>
+
+    <p>The price of a 12-month (2 periods) bond having Par Value \$1 and annual coupon rate $R_{2}$ satisfies</p>
+        <div class="eq">\[
+            \tfrac{1}{2}R_{2}P_{1} + (1+\tfrac{1}{2}R_{2})P_{2} = 1;
+        \]</div>
+    <p>the price of an 18-month bond having annual coupon rate $R_{3}$ satisfies</p>
+        <div class="eq">\[
+            \tfrac{1}{2}R_{3}P_{1} + \tfrac{1}{2}R_{3}P_{2} + (1+\tfrac{1}{2}R_{3})P_{3} = 1,
+        \]</div>
+    <p>and so forth for 24-, 30-, 36-, ... month maturity bonds. Having determined $P_{1} = (1+\tfrac{1}{2}R_{1})^{-1}$, the above equations allow us to iteratively solve for $P_{k}$ for all $k ≥ 2$ for which $R_{k}$ is defined; in
+    particular, we have</p>
+        <div class="eq">\[
+            P_{k} = \frac{1 - \tfrac{1}{2}R_{k}(P_{1}+\cdots+P_{k-1})}{1 + \tfrac{1}{2}R_{k}} \qquad (k ≥ 2).
+        \]</div>
+
+
+    <h3>Interpolation methods</h3>
+    <!-- ===================== -->
+    <p>Given "known" points $(t_0, x_0)$ and $(t_1, x_1)$, we want to determine values $x_{t}$ for all $t_0 ≤ t ≤ t_{1}$. It is standard to normalize</p>
+        <div class="eq">\[
+            t_0 ≤ t ≤ t_1 \qquad\text{via setting}\qquad
+            \lambda := \frac{t - t_0}{t_1 - t_0}, \quad 0 ≤ \lambda ≤ 1.
+        \]</div>
+    <p><strong>Note:</strong> This definition of $\lambda$ is commonly expressed via</p>
+        <div class="eq">\[ 
+            t = (1-\lambda)t_{0} + \lambda t_{1}, \qquad (0 ≤ \lambda ≤ 1) 
+        \]</div>
+
+    <h5>Linear interpolation:</h5>
+    <!-- ===================== -->
+        <div class="eq">\[
+            x_{t} := (1-\lambda)x_0 + \lambda x_1 \qquad\Leftrightarrow\qquad
+            x_{t} := \Big(\frac{t_{1}-t}{t_{1}-t_{0}}\Big) x_{0} + \Big(\frac{t-t_{0}}{t_{1}-t_{0}}\Big) x_{1}.
+        \]</div>
+    <p>This is the same as the intuitive "slope form"</p>
+        <div class="eq">\[
+            x_{t} := x_{0} + \frac{x_1-x_0}{1-0}\lambda \qquad\Leftrightarrow\qquad
+            x_{t} := x_{0} + \Big(\frac{x_1-x_0}{t_1-t_0}\Big)(t-t_0),
+        \]</div>
+
+    <h5>Log interpolation:</h5>
+    <!-- ================== -->
+        <div class="eq">\[
+            x_{t} := x_{0}^{1-\lambda}x_{1}^{\lambda} \quad\Leftrightarrow\quad
+            x_{0}^{(\frac{t_1-t}{t_1-t_0})}x_{1}^{(\frac{t-t_0}{t_1-t_0})} \quad\Leftrightarrow\quad
+            x_{t} := \exp\!\Big[ (1-\lambda)\log x_{0} + \lambda\log x_{1} \Big]
+        \]</div>
+</body>
+
+</html>

@@ -1,5 +1,3 @@
-
-
 .hero {
   position: relative;
 
@@ -52,7 +50,6 @@
     gap: 18px;
   }
 }
-
 
 #docs {
   border-right: 1px solid var(--border);

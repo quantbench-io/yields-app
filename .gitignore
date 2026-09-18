@@ -26,8 +26,8 @@ dist-ssr
 backend/data/csv/*
 data/xml/*
 **/.ipynb_checkpoints
-**/__pycache__/*
-backend/__pycache__/*
+**/__pycache__
+backend/__pycache__
 frontend-ts/mathjax
 mjx4-page/mathjax
 frontend-js/mathjax

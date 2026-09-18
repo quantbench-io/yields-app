@@ -20,7 +20,7 @@ app.frontend("/", directory=static_html_path)
 # a temporary wrapper for the different datasets;
 def compute_zero_curve(date, par_data):
     if par_data == []:
-        _data = {
+        data = {
             "date": f"{date} does not have data.",
             "parNodes": [],
             "parPlots": [],
@@ -28,16 +28,16 @@ def compute_zero_curve(date, par_data):
             "zeroNodes": [],
             "zeroPlots": []
         }
-        return _data
+        return data
 
     # some dates don't have values for every maturity, and have
     #   (tau, None)
-    # instead. We don't want to use those in the interpolation, so we drop.
+    # instead. We don't use these in the interpolation.
     par_nodes = [x for x in par_data if x[1] is not None]
 
     R_nodes, R_t, P_nodes, Z_nodes, Z_t = zeros_from_par_nodes(par_nodes, freq=2)
 
-    _data = {
+    data = {
         "date": date,
         "parNodes": R_nodes,
         "parPlots": R_t,
@@ -46,8 +46,12 @@ def compute_zero_curve(date, par_data):
         "zeroPlots": Z_t
     }
 
-    return _data
+    assert len(data["parNodes"]) == len(data["priceNodes"]), "Mismatched price data length"
+    assert len(data["parNodes"]) == len(data["zeroNodes"]), "Mismatched zeros data length"
 
+    return data
+
+# For testing
 def pprint(dic):
     print(f"date: {dic['date']}")
     print("R \t\t\t\t\t P \t\t\t\t\t Z")
@@ -61,14 +65,10 @@ def pprint(dic):
 
 # ===============================================
 @app.get("/api/v1/yieldcurve/{date}")
-async def get_yield_curve(date: str):
+async def yield_curve(date: str):
     if date=="latest" :
         latest_date, par_data = get_latest_pars()
-        # _X = compute_zero_curve(latest_date, par_data)
-        # pprint(_X)
         return compute_zero_curve(latest_date, par_data)
     else :
         par_data = get_pars(date)
-        # _X = compute_zero_curve(date, par_data)
-        # pprint(_X)
         return compute_zero_curve(date, par_data)

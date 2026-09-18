@@ -16,14 +16,17 @@ export default function App() {
   const [date, setDate] = useState("2024-11-18");
   const [draft, setDraft] = useState(date);
 
-  const [zeroNodes, setZeroNodes] = useState([]);
+  const [parNodes, setParNodes] = useState([]);
+  const [parPlots, setParPlots] = useState({x:[], y:[]});
 
-  const [parPlotNodes, setParPlotNodes] = useState({x:[], y:[]});
-  const [zeroPlotLogs, setZeroPlotLogs] = useState({x:[], y:[]});
+  const [priceNodes, setPriceNodes] = useState([]);
+
+  const [zeroNodes, setZeroNodes] = useState([]);
+  const [zeroPlots, setZeroPlots] = useState({x:[], y:[]});
 
   const [titleText, setTitleText] = useState(date);
 
-  function getSeries(seriesData) {
+  function unzipTimeSeries(seriesData) {
     const data = {
       x: seriesData.map(([t])=>12.0*t),
       y: seriesData.map(([,r])=>r)
@@ -35,18 +38,22 @@ export default function App() {
     fetchPars(date).then((body) => {
       console.log(body);
 
-      // setParNodes(body.parNodes);
-      // setDiscountNodes(body.discountNodes);
+      setParNodes(body.parNodes);
+      setParPlots(body.parPlots);
+
+      setPriceNodes(body.priceNodes);
+
       setZeroNodes(body.zeroNodes);
-      // setZeroLogs(body.zeroLogs);
+      setZeroPlots(body.zeroPlots);
+
       setTitleText(body.date);
 
-      return [body.parNodes, body.zeroLogs];
+      return [body.parPlots, body.zeroPlots];
     })
-      .then(([_parNodes,_zeroLogs]) => {
+      .then(([_parPlots,_zeroPlots]) => {
         // to make sure they use the updated values
-        setParPlotNodes(getSeries(_parNodes));
-        setZeroPlotLogs(getSeries(_zeroLogs));
+        setParPlots(unzipTimeSeries(_parPlots));
+        setZeroPlots(unzipTimeSeries(_zeroPlots));
       });
   }, [date]);
 
@@ -56,20 +63,20 @@ export default function App() {
   }
 
   const plotData = [
-    {...parPlotNodes, type: "scatter", name: "Par Yields (Lin-Int)"},
-    {...zeroPlotLogs, type: "scatter", name: "Zeros (Log-Int)"},
+    {...parPlots, type: "scatter", name: "Pars (Lin-Int)"},
+    {...zeroPlots, type: "scatter", name: "Zeros (Log-Int)"},
   ];
-
-  // const saveData = [
-  //     ["TauData", "ParYields", "DiscountFactors", "ZeroRates"],
-  //     ...(parNodes.map(([t,r],i)=>[t, r, discountNodes?.[i]?.[1], zeroNodes?.[i]?.[1]]))
-  // ];
 
   const saveData = [
-    ["TauData", "ZeroRates"],
-    ...zeroNodes
+      ["TauData", "parYields", "priceFactors", "ZeroRates"],
+      ...(parNodes.map(([t,R],i)=>[t, R, priceNodes[i][1], zeroNodes[i][1]]))
   ];
-
+  //
+  // const saveData = [
+  //   ["TauData", "ZeroRates"],
+  //   ...zeroNodes
+  // ];
+  //
   const layoutData = {
     title: {text: titleText},
   };
@@ -85,15 +92,15 @@ export default function App() {
         <form onSubmit={handleSubmit}>
           <input type="text" value={draft} onChange={e => setDraft(e.currentTarget.value)} style={{width: "100px"}} />
 
-          <button type="submit" style={{marginRight: "10px"}}>Submit</button>
+          <button type="submit" style={{marginRight: "0px"}}>Submit</button>
           <TodayButton
             setDraft={setDraft}
             setDate={setDate}
             setTitleText={setTitleText}
-            setParPlotNodes={setParPlotNodes}
-            setZeroPlotLogs={setZeroPlotLogs}
+            setParPlots={setParPlots}
+            setZeroPlots={setZeroPlots}
           />
-          <CSVButton data={saveData} fileName="scratch.csv" />
+          <CSVButton data={saveData} fileName={`yields-${date}.csv`} />
         </form>
       </div>
       <Plot data={plotData} layout={layoutData} config={configData}/>

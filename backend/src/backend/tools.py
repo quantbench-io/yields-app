@@ -106,7 +106,8 @@ def interpolate_f(nodes, mode):
     return np.vectorize(_f)
 
 def interpolate_R(par_nodes, freq, mode):
-    tt_short = sharp_interval(1/12, 1/2, step=1/12) # gets an evenly spaced interval
+    t_min = par_nodes[0][0];
+    tt_short = sharp_interval(t_min, 1/2, step=1/12) # gets an evenly spaced interval
 
     t_max = par_nodes[-1][0];
     tt_long = sharp_interval(0.5, t_max, step=1/freq)
@@ -127,8 +128,9 @@ def interpolate_R(par_nodes, freq, mode):
 def interpolate_monthly_P(P_t, mode):
     nodes_t, _ = zip(*P_t)
 
+    t_min = nodes_t[0]
     t_max = nodes_t[-1]
-    tt = sharp_interval(1/12, t_max, samples=12*t_max)
+    tt = sharp_interval(t_min, t_max, step=1/12)
 
     P_t = [(round(t, PREC), p) for t, p in P_t]
 

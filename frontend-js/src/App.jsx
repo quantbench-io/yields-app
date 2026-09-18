@@ -4,11 +4,11 @@ import './App.css'
 import {CSVButton, TodayButton} from "./ExtraButtons.jsx";
 
 const API_BASE_URL = "http://localhost:3000";
-// const YIELDCURVE = "/api/v1/yieldcurve/";
+const YIELDCURVE = "/api/v1/yieldcurve/";
 
-async function fetchPars(date) {
+async function fetchYields(date) {
 //   const url = new URL(YIELDCURVE+date, API_BASE_URL);
-  const res = await fetch(API_BASE_URL+`/api/v1/yieldcurve/${date}`);
+  const res = await fetch(API_BASE_URL+YIELDCURVE+`${date}`);
   return res.json();
 }
 
@@ -28,14 +28,14 @@ export default function App() {
 
   function unzipTimeSeries(seriesData) {
     const data = {
-      x: seriesData.map(([t])=>12.0*t),
+      x: seriesData.map(([t])=>12.0*t), // year-fraction to integer months
       y: seriesData.map(([,r])=>r)
     };
     return data;
   }
 
   useEffect(() => {
-    fetchPars(date).then((body) => {
+    fetchYields(date).then((body) => {
       console.log(body);
 
       setParNodes(body.parNodes);
@@ -71,12 +71,7 @@ export default function App() {
       ["TauData", "parYields", "priceFactors", "ZeroRates"],
       ...(parNodes.map(([t,R],i)=>[t, R, priceNodes[i][1], zeroNodes[i][1]]))
   ];
-  //
-  // const saveData = [
-  //   ["TauData", "ZeroRates"],
-  //   ...zeroNodes
-  // ];
-  //
+
   const layoutData = {
     title: {text: titleText},
   };
@@ -100,7 +95,7 @@ export default function App() {
             setParPlots={setParPlots}
             setZeroPlots={setZeroPlots}
           />
-          <CSVButton data={saveData} fileName={`yields-${date}.csv`} />
+          <CSVButton data={saveData} fileName={`yields-${titleText}.csv`} />
         </form>
       </div>
       <Plot data={plotData} layout={layoutData} config={configData}/>

@@ -18,14 +18,14 @@ export function CSVButton({data, fileName}) {
 
 
 export function TodayButton(
-    {setDraft, setDate, setTitleText, setParPlotNodes, setZeroPlotLogs}
+    {setDraft, setDate, setTitleText, setParPlots, setZeroPlots}
 ) {
     function handleClick() {
         setDraft("latest");
         setDate("latest");
         setTitleText("Retrieving...");
-        setParPlotNodes({x:[], y:[]});
-        setZeroPlotLogs({x:[], y:[]});
+        setParPlots({x:[], y:[]});
+        setZeroPlots({x:[], y:[]});
     }
     return <button onClick={handleClick}>Get Latest</button>;
 }

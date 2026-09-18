@@ -11,7 +11,7 @@ from get_pars import (
     get_pars,
     get_latest_pars,
     get_pars_xml,
-    parse_pars
+    parse_parse_from_xml
 )
 
 # =====================================
@@ -63,7 +63,7 @@ def main():
         with open(xml_dir/f"pars{year}.xml", "w") as file:
             file.write(xml)
 
-        pars = parse_pars(xml)
+        pars = parse_pars_from_xml(xml)
 
         pars_table = series_dict_to_table(pars)
         try:

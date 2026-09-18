@@ -67,7 +67,7 @@ def parse_pars_regex(xml: str):
 
 
 # =====================================
-def lookup_par_ser_date(date:str, DB:str) -> list:
+def lookup_pars_ser_date(date:str, DB:str) -> list:
     conn = sql.connect(DB)
     cur = conn.cursor()
 
@@ -103,7 +103,7 @@ def more_than_a_week(date: str) -> bool:
 def get_pars(date: str):
 
     # check if DB_FILE has data for date
-    pars_ser = lookup_par_ser_date(date, DB_FILE)
+    pars_ser = lookup_pars_ser_date(date, DB_FILE)
 
     # No published data for 2010-10-11, yet appears in Treasury files;
     # will drop this row from SQL table later

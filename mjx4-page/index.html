@@ -20,7 +20,15 @@
         output: {
           font: 'mathjax-stix2',
           fontPath: '/mathjax/mathjax-stix2-font',
-        }
+        },
+        <!--      // chtml: {matchFontHeight: true} // Automatically scales math size to match surrounding text-->
+      <!--      // startup: {-->
+      <!--      //   pageReady: () => {-->
+      <!--      //     return MathJax.startup.defaultPageReady().then(() => {-->
+      <!--      //       document.body.style.visibility = "visible"; // reveal after typeset-->
+      <!--      //     });-->
+      <!--      //   }-->
+      <!--      // }-->
       };
     </script>
 

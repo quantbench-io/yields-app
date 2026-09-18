@@ -3,9 +3,8 @@ import Plot from "react-plotly.js";
 import './App.css'
 import {CSVButton, TodayButton} from "./ExtraButtons.jsx";
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "http://localhost:3000";
 // const YIELDCURVE = "/api/v1/yieldcurve/";
-
 
 async function fetchPars(date) {
 //   const url = new URL(YIELDCURVE+date, API_BASE_URL);
@@ -13,11 +12,9 @@ async function fetchPars(date) {
   return res.json();
 }
 
-
 export default function App() {
   const [date, setDate] = useState("2024-11-18");
   const [draft, setDraft] = useState(date);
-  // const [latest, setLatest] = useState(false);
 
   const [zeroNodes, setZeroNodes] = useState([]);
 
@@ -67,16 +64,27 @@ export default function App() {
   //     ["TauData", "ParYields", "DiscountFactors", "ZeroRates"],
   //     ...(parNodes.map(([t,r],i)=>[t, r, discountNodes?.[i]?.[1], zeroNodes?.[i]?.[1]]))
   // ];
+
   const saveData = [
     ["TauData", "ZeroRates"],
     ...zeroNodes
   ];
+
+  const layoutData = {
+    title: {text: titleText},
+  };
+
+  const configData = {
+    modeBarButtonsToRemove: ['lasso2d', 'autoScale2d', 'toImage', 'sendChartToCloud'],
+    displaylogo: false,
+  };
 
   return (
     <div style={{marginTop: "30px", display:"flex", flexDirection:"column", gap:"30px"}}>
       <div>
         <form onSubmit={handleSubmit}>
           <input type="text" value={draft} onChange={e => setDraft(e.currentTarget.value)} style={{width: "100px"}} />
+
           <button type="submit" style={{marginRight: "10px"}}>Submit</button>
           <TodayButton
             setDraft={setDraft}
@@ -88,10 +96,7 @@ export default function App() {
           <CSVButton data={saveData} fileName="scratch.csv" />
         </form>
       </div>
-      <Plot data={plotData} layout={{title:{text:titleText}}} />
+      <Plot data={plotData} layout={layoutData} config={configData}/>
     </div>
   );
-}
-
-
-// ==========================
+} //App

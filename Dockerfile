@@ -5,12 +5,12 @@ RUN chmod +x /backend/docker-entrypoint.sh
 WORKDIR /backend
 RUN uv sync
 
-FROM node:26-alpine AS frontend
-COPY ./frontend /frontend
-WORKDIR /frontend
-RUN npm install && npm run build
-
-FROM backend
-COPY --from=frontend /frontend/dist /frontend/dist
-WORKDIR /backend
+#FROM node:26-alpine AS frontend
+#COPY ./frontend-js /frontend-js
+#WORKDIR /frontend-js
+#RUN npm install && npm run build
+#
+#FROM backend
+#COPY --from=frontend /frontend-js/dist /frontend-js/dist
+#WORKDIR /backend
 ENTRYPOINT ["/backend/docker-entrypoint.sh"]

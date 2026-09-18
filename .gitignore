@@ -28,5 +28,6 @@ data/xml/*
 **/.ipynb_checkpoints
 **/__pycache__/*
 backend/__pycache__/*
-frontend-ts/mathjax/mathjax-newcm-font
-mjx4-page/mathjax/
+frontend-ts/mathjax
+mjx4-page/mathjax
+frontend-js/mathjax

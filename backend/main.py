@@ -5,7 +5,7 @@ from src.backend.get_pars import *
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-static_html_path = os.getenv("STATIC_HTML_PATH") or "../frontend/dist"
+static_html_path = os.getenv("STATIC_HTML_PATH") or "../frontend-js/dist"
 
 app = FastAPI()
 app.add_middleware(
@@ -23,9 +23,10 @@ def compute_zero_curve(date, par_data):
         _data = {
             "date": f"{date} does not have data.",
             "parNodes": [],
-            "discountNodes": [],
+            "parPlots": [],
+            "priceNodes": [],
             "zeroNodes": [],
-            "zeroLogs": []
+            "zeroPlots": []
         }
         return _data
 
@@ -33,24 +34,41 @@ def compute_zero_curve(date, par_data):
     #   (tau, None)
     # instead. We don't want to use those in the interpolation, so we drop.
     par_nodes = [x for x in par_data if x[1] is not None]
-    D_nodes, Z_nodes, Z_log = zeros_from_par_nodes(par_nodes, freq=2)
+
+    R_nodes, R_t, P_nodes, Z_nodes, Z_t = zeros_from_par_nodes(par_nodes, freq=2)
 
     _data = {
         "date": date,
-        "parNodes": par_nodes,
-        "discountNodes": D_nodes,
+        "parNodes": R_nodes,
+        "parPlots": R_t,
+        "priceNodes": P_nodes,
         "zeroNodes": Z_nodes,
-        "zeroLogs": Z_log
+        "zeroPlots": Z_t
     }
 
     return _data
+
+def pprint(dic):
+    print(f"date: {dic['date']}")
+    print("R \t\t\t\t\t P \t\t\t\t\t Z")
+    print("===============================")
+    for i in range(len(dic['parNodes'])) :
+        tR, R = dic['parNodes'][i]
+        tP, P = dic['priceNodes'][i]
+        tZ, Z = dic['zeroNodes'][i]
+
+        print(f"({tR:.3f}, {R:.3f}), \t\t\t ({tP:.3f}, {P:.3f}), \t\t\t ({tZ:.3f}, {Z:.3f})")
 
 # ===============================================
 @app.get("/api/v1/yieldcurve/{date}")
 async def get_yield_curve(date: str):
     if date=="latest" :
         latest_date, par_data = get_latest_pars()
+        # _X = compute_zero_curve(latest_date, par_data)
+        # pprint(_X)
         return compute_zero_curve(latest_date, par_data)
     else :
         par_data = get_pars(date)
+        # _X = compute_zero_curve(date, par_data)
+        # pprint(_X)
         return compute_zero_curve(date, par_data)

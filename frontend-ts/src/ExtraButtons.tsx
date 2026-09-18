@@ -24,19 +24,19 @@ type TodayButtonProps = {
     setDraft: (s: string) => void;
     setDate: (s: string) => void;
     setTitleText: (s: string) => void;
-    setParPlotNodes: (ser: {x: number[], y: number[]}) => void;
-    setZeroPlotLogs: (ser: {x: number[], y: number[]}) => void;
+    setParPlots: (ser: {x: number[], y: number[]}) => void;
+    setZeroPlots: (ser: {x: number[], y: number[]}) => void;
 }
 
 export function TodayButton(
-    {setDraft, setDate, setTitleText, setParPlotNodes, setZeroPlotLogs}: TodayButtonProps
+    {setDraft, setDate, setTitleText, setParPlots, setZeroPlots}: TodayButtonProps
 ) {
     function handleClick() {
         setDraft("latest");
         setDate("latest");
         setTitleText("Retrieving...");
-        setParPlotNodes({x:[], y:[]});
-        setZeroPlotLogs({x:[], y:[]});
+        setParPlots({x:[], y:[]});
+        setZeroPlots({x:[], y:[]});
     }
     return <button onClick={handleClick}>Get Latest</button>;
 }

@@ -3,6 +3,7 @@ import sqlite3 as sql
 import os
 
 from urllib.parse import urlencode
+from src.backend.xml_parse import pars_data_from_xml
 
 # ===============================================
 BASE_URL = "https://home.treasury.gov"
@@ -44,7 +45,7 @@ def get_pars_xml(date: str, mode="month"):
 
 
 # =====================================
-def parse_pars(xml: str):
+def parse_pars_regex(xml: str):
     PROPS_ALL=re.findall(r"<m:properties>(.*?)</m:properties>", xml, re.S)
 
     PARS={}
@@ -101,7 +102,6 @@ def more_than_a_week(date: str) -> bool:
 # =====================================
 def get_pars(date: str):
 
-    print(os.getcwd())
     # check if DB_FILE has data for date
     pars_ser = lookup_par_ser_date(date, DB_FILE)
 
@@ -121,8 +121,8 @@ def get_pars(date: str):
     # otherwise, try to pull it down.
     # (no update DB function at the moment)
     else:
-        xml = get_pars_xml(date, mode="month")
-        pars_data = parse_pars(xml)
+        xml_str = get_pars_xml(date, mode="month")
+        pars_data = parse_parse_from_xml(xml_str)
 
         return pars_data.get(date, [])
 
@@ -135,8 +135,8 @@ def get_latest_pars():
     """
     date = time.strftime("%Y-%m-%d", time.localtime())
 
-    xml = get_pars_xml(date, mode="month")
-    pars_data = parse_pars(xml)
+    xml_str = get_pars_xml(date, mode="month")
+    pars_data = parse_pars_from_xml(xml_str)
 
     latest = max(pars_data.keys())
 

@@ -14,13 +14,11 @@ namespaces = {
     '': 'http://www.w3.org/2005/Atom'
 }
 
-def pars_data_from_xml(xml_str: str, ns: dict):
+def pars_data_from_xml(xml_str: str, ns: dict = namespaces):
     root = ET.fromstring(xml_str)
 
     entries = root.findall('entry', ns)
-
     entries_dict = dict()
-
     for entry in entries:
         prop = entry.find('./content/m:properties', ns)
         prop_dict = dict()
@@ -33,10 +31,9 @@ def pars_data_from_xml(xml_str: str, ns: dict):
         date = prop_dict.pop('NEW_DATE')[1].removesuffix('T00:00:00')
         entries_dict[date] = prop_dict
 
-    pars_data = dict()
-
     # returns a series of (tau, rate)
-    for date, date_pars in entry_test.items():
+    pars_data = dict()
+    for date, date_pars in entries_dict.items():
         t_series = []
         for mat, tau in mat_map.items():
             datum = date_pars.get(mat)

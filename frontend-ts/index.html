@@ -51,17 +51,16 @@
 
   <!-- ==================================== -->
   <hr>
-  <h3>Documentation: "bootstrapping" zero-rates</h3>
-  <hr>
-
+  <h2 style="margin-top: 5px;">Documentation: "bootstrapping" zero-rates</h2>
+  <hr style="margin-bottom: 10px;"/>
   <div id="math-notes">
     <!-- ==================================== -->
     <b>Notation:</b>
     <ul>
       <li>$\tau$ is the <i>year fraction</i>; for simplicity we ignore day-count conventions here.</li>
-      <li>$R_{\tau}$ is the (annual) <i>coupon rate</i> for a $\tau$-year bond:
+      <li>$C_{\tau}$ is the (annual) <i>coupon rate</i> for a $\tau$-year bond:
         that is, a bond with face value $A$, coupon rate $R$, and semiannual coupon payments,
-        pays $\frac{1}{2}AR$ every 6 months.
+        pays $\frac{1}{2}AC$ every 6 months.
       </li>
       <li>$P_{\tau}$ is the <i>present value factor</i> (or <i>discount factor</i>) for maturity $\tau$:
         it is the cash price to receive <span>$</span>1 $\tau$ years from now.
@@ -69,111 +68,179 @@
     </ul>
 
     <!-- ==================================== -->
-    <p>Given the <i>par yields</i> $R_{\tau_{1}}, R_{\tau_{2}}, \ldots R_{\tau_{N}}$ for Treasury securities maturing at
+    <p>Given the <i>par yields</i> $C_{\tau_{1}}, C_{\tau_{2}}, \ldots C_{\tau_{N}}$ for Treasury securities maturing at
       times
       $\tau_{1}, \ldots, \tau_{N}$, our goals are:</p>
     <ol>
-      <li>Select an appropriate interpolation method to infer/compute values $R_{\tau}$ for
+      <li>Select an appropriate interpolation method to infer/compute values $C_{\tau}$ for
         all $\tau_{1} \leq \tau \leq \tau_{N}$;
       </li>
-      <li>Use the "curve" of values $R_{\tau}$ ($\tau_{1} \leq \tau \leq \tau_{N}$) to iteratively compute the
+      <li>Use the "curve" of values $C_{\tau}$ ($\tau_{1} \leq \tau \leq \tau_{N}$) to iteratively compute the
         "zero-coupon" <i>discount factors</i>
         <div class="eq">\[
           P_{\tau_{1}}, P_{\tau_{2}}, \ldots, P_{\tau_{N}}.
           \]
         </div>
       </li>
-      <li>Interpolate (using some selected method) the values $(P_{\tau_{1}}, \ldots, P_{\tau_{N}})$ to produce
-        a "curve" $P_{\tau}$ for $\tau_{1} \leq \tau \leq \tau_{N}$.
+      <li>Use the values $(P_{\tau_{1}}, \ldots, P_{\tau_{N}})$ to interpolate
+        a "curve" of values $P_{\tau}$ for $\tau_{1} \leq \tau \leq \tau_{N}$.
       </li>
       <li>Map the values $P_{\tau}$ to "<i>zero/spot rates</i>" $Z_{\tau}$ under a predetermined discounting scheme.
       </li>
     </ol>
 
-    <details class="math-details">
-      <summary><b>For T-Bills ($\tau \leq \frac{1}{2}$)</b></summary>
-
-      <p>Treasury bills have $\tau \leq \frac{1}{2}$ and have no coupon payments; for these, the Treasury publishes the
-        "Bond-Equivalent Rates",
-        which correspond to zero-coupon prices directly via</p>
-      <div class="eq">\[
-        P_{\tau} = (1 + R_{\tau}\,\tau)^{-1}.
-        \]
-      </div>
-    </details>
-
-    <details class="math-details">
-      <summary><b>For T-Notes and T-Bonds ($\tau \geq 1$)</b></summary>
-
-      <p>Treasury <i>Notes</i> and <i>Bonds</i> have semiannual coupon payments, which we assume are reinvested.
-        To simplify our notation, we reset our "unit" of time so that</p>
-      <div class="eq">\[
-        6\text{ months} = 1 \text{ ``period''}.
-        \]
-      </div>
-      <p>For instance then, a bond maturing in 18 months has cash flows at times $t=1, 2, 3$.</p>
-
-      <p>The price of a 12-month (2 periods) bond having Par Value \$1 and annual coupon rate $R_{2}$ satisfies</p>
-      <div class="eq">\[
-        \tfrac{1}{2}R_{2}P_{1} + (1+\tfrac{1}{2}R_{2})P_{2} = 1;
-        \]
-      </div>
-      <p>the price of an 18-month bond having annual coupon rate $R_{3}$ satisfies</p>
-      <div class="eq">\[
-        \tfrac{1}{2}R_{3}P_{1} + \tfrac{1}{2}R_{3}P_{2} + (1+\tfrac{1}{2}R_{3})P_{3} = 1,
-        \]
-      </div>
-      <p>and so forth for 24-, 30-, 36-, ... month maturity bonds. Having determined
-        $P_{1} = (1+\tfrac{1}{2}R_{1})^{-1}$, the above equations allow us to iteratively solve for
-        $P_{k}$ for all $k \geq 2$ for which $R_{k}$ is defined; in particular, we have</p>
-      <div class="eq">\[
-        P_{k} = \frac{1 - \tfrac{1}{2}R_{k}(P_{1}+\cdots+P_{k-1})}{1 + \tfrac{1}{2}R_{k}} \qquad (k \geq 2).
-        \]
-      </div>
-    </details>
-
     <!-- ==================================== -->
-    <h3>Interpolation Methods</h3>
+    <div>
+      <h2>Interpolation Methods</h2>
 
-    <p>Given "known" points $(t_0, x_0)$ and $(t_1, x_1)$, we want to determine values $x_{t}$
-      for all $t_0 \leq t \leq t_{1}$. It is standard to normalize</p>
-    <div class="eq">\[
-      t_0\leq t \leq t_1 \quad\text{via setting}\quad
-      \lambda := \frac{t - t_0}{t_1 - t_0}, \quad
-      \text{so that}\quad 0 \leq \lambda \leq 1.
-      \]
+      <p>Given "known" points $(t_0, x_0)$ and $(t_1, x_1)$, we want to determine values $x_{t}$
+        for all $t_0 \leq t \leq t_{1}$. It is standard to normalize</p>
+      <div class="eq">\[
+        t_0\leq t \leq t_1 \quad\text{via setting}\quad
+        \lambda := \frac{t - t_0}{t_1 - t_0}, \quad
+        \text{so that}\quad 0 \leq \lambda \leq 1.
+        \]
+      </div>
+
+      <b>Note:</b> This definition of $\lambda$ is commonly expressed via
+      <div class="eq">\[
+        t = (1–\lambda)t_{0} + \lambda t_{1}, \qquad (0 \leq \lambda \leq 1)
+        \]
+      </div>
+
+      <details class="math-details">
+        <summary><b>Linear interpolation</b></summary>
+        <div class="eq">\[
+          x_{t} := (1-\lambda)x_0 + \lambda x_1 \qquad\Leftrightarrow\qquad
+          x_{t} := \Big(\frac{t_{1}-t}{t_{1}-t_{0}}\big) x_{0} + \Big(\frac{t-t_{0}}{t_{1}-t_{0}}\Big) x_{1}.
+          \]
+        </div>
+        <p>This is the same as the intuitive "slope form"</p>
+        <div class="eq">\[
+          x_{t} := x_{0} + \frac{x_1-x_0}{1-0} \lambda \qquad\Leftrightarrow\qquad
+          x_{t} := x_{0} + \Big(\frac{x_1-x_0}{t_1-t_0}\Big)(t-t_0),
+          \]
+        </div>
+      </details>
+
+      <details class="math-details">
+        <summary><b>Log interpolation</b></summary>
+        <div class="eq">\[
+          x_{t} := x_{0}^{1-\lambda}x_{1}^{\lambda} \quad\Leftrightarrow\quad
+          x_{0}^{(\frac{t_1-t}{t_1-t_0})}x_{1}^{(\frac{t-t_0}{t_1-t_0})} \quad\Leftrightarrow\quad
+          x_{t} := \exp\!\big[ (1-\lambda)\log x_{0} + \lambda\log x_{1} \big]
+          \]
+        </div>
+      </details>
     </div>
 
-    <b>Note:</b> This definition of $\lambda$ is commonly expressed via
-    <div class="eq">\[
-      t = (1–\lambda)t_{0} + \lambda t_{1}, \qquad (0 \leq \lambda \leq 1)
-      \]
+    <div>
+      <h2>The bootstrapping</h2>
+
+      <details class="math-details">
+        <summary><b>For T-Bills ($\tau \leq \frac{1}{2}$)</b></summary>
+
+        <p>Treasury bills have $\tau \leq \frac{1}{2}$ and have no coupon payments; for these, the Treasury publishes the
+          "Bond-Equivalent Rates",
+          which correspond to zero-coupon prices directly via</p>
+        <div class="eq">\[
+          P_{\tau} = (1 + C_{\tau}\,\tau)^{-1}.
+          \]
+        </div>
+      </details>
+
+      <details class="math-details">
+        <summary><b>For T-Notes and T-Bonds ($\tau \geq 1$)</b></summary>
+
+        <p>Treasury <i>Notes</i> and <i>Bonds</i> have semiannual coupon payments, which we assume are reinvested.
+          To simplify our notation, we reset our "unit" of time so that</p>
+        <div class="eq">\[
+          6\text{ months} = 1 \text{ ``period''}.
+          \]
+        </div>
+        <p>For instance then, a bond maturing in 18 months has cash flows at times $t=1, 2, 3$.</p>
+
+        <p>The price of a 12-month (2 periods) bond having Par Value \$1 and annual coupon rate $C_{2}$ satisfies</p>
+        <div class="eq">\[
+          \tfrac{1}{2}C_{2}P_{1} + (1+\tfrac{1}{2}C_{2})P_{2} = 1;
+          \]
+        </div>
+        <p>the price of an 18-month bond having annual coupon rate $C_{3}$ satisfies</p>
+        <div class="eq">\[
+          \tfrac{1}{2}C_{3}P_{1} + \tfrac{1}{2}C_{3}P_{2} + (1+\tfrac{1}{2}C_{3})P_{3} = 1,
+          \]
+        </div>
+        <p>and so forth for 24-, 30-, 36-, ... month maturity bonds. Having determined
+          $P_{1} = (1+\tfrac{1}{2}C_{1})^{-1}$, the above equations allow us to iteratively solve for
+          $P_{k}$ for all $k \geq 2$ for which $C_{k}$ is defined; in particular, we have</p>
+        <div class="eq">\[
+          P_{k} = \frac{1 - \tfrac{1}{2}C_{k}(P_{1}+\cdots+P_{k-1})}{1 + \tfrac{1}{2}C_{k}} \qquad (k \geq 2).
+          \]
+        </div>
+      </details>
     </div>
 
-    <details class="math-details">
-      <summary><b>Linear interpolation</b></summary>
-      <div class="eq">\[
-        x_{t} := (1-\lambda)x_0 + \lambda x_1 \qquad\Leftrightarrow\qquad
-        x_{t} := \Big(\frac{t_{1}-t}{t_{1}-t_{0}}\big) x_{0} + \Big(\frac{t-t_{0}}{t_{1}-t_{0}}\Big) x_{1}.
-        \]
-      </div>
-      <p>This is the same as the intuitive "slope form"</p>
-      <div class="eq">\[
-        x_{t} := x_{0} + \frac{x_1-x_0}{1-0} \lambda \qquad\Leftrightarrow\qquad
-        x_{t} := x_{0} + \Big(\frac{x_1-x_0}{t_1-t_0}\Big)(t-t_0),
-        \]
-      </div>
-    </details>
 
-    <details class="math-details">
-      <summary><b>Log interpolation</b></summary>
-      <div class="eq">\[
-        x_{t} := x_{0}^{1-\lambda}x_{1}^{\lambda} \quad\Leftrightarrow\quad
-        x_{0}^{(\frac{t_1-t}{t_1-t_0})}x_{1}^{(\frac{t-t_0}{t_1-t_0})} \quad\Leftrightarrow\quad
-        x_{t} := \exp\!\big[ (1-\lambda)\log x_{0} + \lambda\log x_{1} \big]
-        \]
-      </div>
-    </details>
+    <!-- =============================== -->
+    <h2>Converting prices to zero-rates</h2>
+    <p>
+      Given the curve of values $P_\tau$, there are several ways to convert this into zero-rates $z_\tau$;
+      here we consider $\tau$ fixed and simply write $z=z_\tau$ to highlight the different dependencies of
+      $P_\tau$ on the "<i>annual</i> rates" $z$.
+    </p>
+    <table>
+      <tr>
+        <th>Convention</th>
+        <th>Equation for $P_\tau = P_{\tau}(z)$</th>
+      </tr>
+      <tr>
+        <td>Annual compounding</td>
+        <td>$P_{\tau}(z) = (1+z)^{-\tau}$</td>
+      </tr>
+      <tr>
+        <td>Compounding $m$-times per annum</td>
+        <td>$P_{\tau}(z) = (1+z^{(m)}/m)^{-m\tau}$</td>
+      </tr>
+      <tr>
+        <td>Continuous compounding</td>
+        <td>$P_{\tau}(z) = e^{-z\tau}$</td>
+      </tr>
+    </table>
+
+  </div>
+  <hr>
+  <div>
+    <!-- ==================================== -->
+    <h2>References</h2>
+
+    <ul>
+      <li>TreasuryDirect.gov:
+        <a href="https://treasurydirect.gov/marketable-securities/understanding-pricing/">
+          Understanding Pricing and Interest Rates
+        </a>
+      </li>
+      <li>ECFR.gov: 31 CFR Appendix B to Part 356, Section VI
+        <a href="https://www.ecfr.gov/current/title-31/subtitle-B/chapter-II/subchapter-A/part-356/appendix-Appendix%20B%20to%20Part%20356">
+          Purchase Price, Discount Rate, and Investment Rate for T-Bills
+        </a>
+      </li>
+      <li>Treasury.gov:
+        <a href="https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/treasury-yield-curve-methodology">
+          Treasury Yield Curve Methodology
+        </a>
+      </li>
+      <li>Treasury.gov:
+        <a href="https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/interest-rates-frequently-asked-questions">
+          Interest Rates FAQ
+        </a>
+      </li>
+      <li>Treasury.gov: (see bottom of page)
+        <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_bill_rates&field_tdr_date_value=2026">
+          Daily Treasury Bill Rates (Coupon-Equivalent definition)
+        </a>
+      </li>
+    </ul>
+
   </div>
   <hr>
 </body>

@@ -35,12 +35,12 @@ def compute_zero_curve(date, par_data):
     # instead. We don't use these in the interpolation.
     par_nodes = [x for x in par_data if x[1] is not None]
 
-    R_nodes, R_t, P_nodes, Z_nodes, Z_t = zeros_from_par_nodes(par_nodes, freq=2)
+    C_nodes, C_t, P_nodes, Z_nodes, Z_t = zeros_from_par_nodes(par_nodes, freq=2)
 
     data = {
         "date": date,
-        "parNodes": R_nodes,
-        "parPlots": R_t,
+        "parNodes": C_nodes,
+        "parPlots": C_t,
         "priceNodes": P_nodes,
         "zeroNodes": Z_nodes,
         "zeroPlots": Z_t
@@ -54,14 +54,14 @@ def compute_zero_curve(date, par_data):
 # For testing
 def pprint(dic):
     print(f"date: {dic['date']}")
-    print("R \t\t\t\t\t P \t\t\t\t\t Z")
+    print("C \t\t\t\t\t P \t\t\t\t\t Z")
     print("===============================")
     for i in range(len(dic['parNodes'])) :
-        tR, R = dic['parNodes'][i]
+        tC, C = dic['parNodes'][i]
         tP, P = dic['priceNodes'][i]
         tZ, Z = dic['zeroNodes'][i]
 
-        print(f"({tR:.3f}, {R:.3f}), \t\t\t ({tP:.3f}, {P:.3f}), \t\t\t ({tZ:.3f}, {Z:.3f})")
+        print(f"({tC:.3f}, {C:.3f}), \t\t\t ({tP:.3f}, {P:.3f}), \t\t\t ({tZ:.3f}, {Z:.3f})")
 
 # ===============================================
 @app.get("/api/v1/yieldcurve/{date}")

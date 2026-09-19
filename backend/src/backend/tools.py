@@ -6,7 +6,7 @@ from decimal import Decimal
 # In some of our interpolations we want to avoid float/rounding trouble with the inputs, so we
 # use Python's `decimal.Decimal` class for better precision-control. For our purposes
 # here, rounding to 15 decimal places is fine for now.
-# 10**(-15) * (365*24*60*60) = 3.1536e-08, so ~30 nanoseconds.
+# 10**(-17) * (365*24*60*60) = 3.1536e-10, so ~0.3 nanoseconds.
 
 PREC = 17 # decimal places to round to
 EPS = Decimal(str(10**(-PREC))) # "epsilon", our precision cutoff
@@ -105,7 +105,7 @@ def interpolate_f(nodes, mode):
 
     return np.vectorize(_f)
 
-def interpolate_R(par_nodes, freq, mode):
+def interpolate_C(par_nodes, freq, mode):
     t_min = par_nodes[0][0];
     tt_short = sharp_interval(t_min, 1/2, step=1/12) # gets an evenly spaced interval
 
@@ -115,13 +115,13 @@ def interpolate_R(par_nodes, freq, mode):
     tt = [*tt_short[:-1], *tt_long] # [-1] to remove the duplicate 1/2
 
     # for `interpolate_f` to work properly, we want `tt` and the `par_nodes` to have the same time precision
-    par_nodes = [(round(t, PREC), r) for t, r in par_nodes]
-    assert all(t in tt for t, r in par_nodes), "t-range `tt` does not match times in rounded-time-`par_nodes`"
+    par_nodes = [(round(t, PREC), C) for t, C in par_nodes]
+    assert all(t in tt for t, _ in par_nodes), "t-range `tt` does not match times in rounded-time-`par_nodes`"
 
-    _R = interpolate_f(par_nodes, mode)
-    RR = _R(tt)
+    _C = interpolate_f(par_nodes, mode)
+    CC = _C(tt)
 
-    return list(zip(tt, RR))
+    return list(zip(tt, CC))
 
 # ===============================================
 # for "continuous" monthly zero
@@ -140,28 +140,28 @@ def interpolate_monthly_P(P_t, mode):
     return list(zip(tt, PP))
 
 # ===============================================
-def bootstrap_P_from_R(R_t, freq=2):
-    # R_t should be a list of (t,ρ_t)
+def bootstrap_P_from_C(C_t, freq=2):
+    # C_t should be a list of (t,c_t)
     # freq is the number of coupon payments per year.
 
     _err = "Coupon rates should be decimals (vs. percents), did you forget to multiply by 1/100?"
-    assert all(r < 1.0 for _, r in R_t), _err
+    assert all(c < 1.0 for _, c in C_t), _err
 
-    R_short, R_long = [], []
-    for t, R in R_t :
-        if t <= 0.5 : R_short.append((t,R))
-        if t >= 0.5 : R_long.append((t,R)) # convenient to keep (0.5, R_{0.5})
+    C_short, C_long = [], []
+    for t, C in C_t :
+        if t <= 0.5 : C_short.append((t,C))
+        if t >= 0.5 : C_long.append((t,C)) # convenient to keep (0.5, C_{0.5})
 
     # easy to compute these
-    P_short = [(t, 1/(1+R*t)) for t, R in R_short]
+    P_short = [(t, 1/(1+C*t)) for t, C in C_short]
 
-    rhos = [(t, R/freq) for t, R in R_long] # per-period coupon payment
-    P_long = [(rhos[0][0], 1/(1+rhos[0][1]))] # this is (0.5,...)
+    coups = [(t, C/freq) for t, C in C_long] # per-period coupon payment
+    P_long = [(coups[0][0], 1/(1+coups[0][1]))] # this is (0.5,...)
 
-    for i in range(1, len(rhos)):
-        t_i, rho_i = rhos[i] # technically these are t_{i+1} is rho_{t_{i+1}}, but no matter
+    for i in range(1, len(coups)):
+        t_i, coup_i = coups[i] # technically these are t_{i+1} is coup_{t_{i+1}}, but no matter
         p_sum = sum(p for _, p in P_long[:i])
-        p_i = (1 - rho_i*p_sum)/(1 + rho_i);
+        p_i = (1 - coup_i*p_sum)/(1 + coup_i);
         P_long.append((t_i, p_i))
 
     return [*P_short[:-1], *P_long]
@@ -193,11 +193,11 @@ def Zm_to_Zc(Zm_t, freq):
 # nice wrapper for the main logic
 def zeros_from_par_nodes(par_nodes, freq=2):
     # percent -> decimals
-    R_nodes = [(round(t, PREC), R/100) for t, R in par_nodes]
-    nodes_t = [t for t, _ in R_nodes]
+    C_nodes = [(round(t, PREC), C/100) for t, C in par_nodes]
+    nodes_t = [t for t, _ in C_nodes]
 
-    R_t = interpolate_R(R_nodes, freq, mode="linear")
-    P_bootstrap = bootstrap_P_from_R(R_t, freq)
+    C_t = interpolate_C(C_nodes, freq, mode="linear")
+    P_bootstrap = bootstrap_P_from_C(C_t, freq)
 
     # making sure that the times for our nodes align with
     # the original times from par_nodes
@@ -213,10 +213,10 @@ def zeros_from_par_nodes(par_nodes, freq=2):
 
     # decimal -> percent
     # =============
-    R_nodes = [(t, 100*R) for t, R in R_nodes]
-    R_t = [(t,100*R) for t, R in R_t]
+    C_nodes = [(t, 100*C) for t, C in C_nodes]
+    C_t = [(t,100*C) for t, C in C_t]
     #   Prices P do not "correspond" to percents
     Z_nodes = [(t, 100*z) for t, z in Z_nodes]
     Z_t = [(t, 100*z) for t, z in Z_t]
 
-    return R_nodes, R_t, P_nodes, Z_nodes, Z_t
+    return C_nodes, C_t, P_nodes, Z_nodes, Z_t

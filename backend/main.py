@@ -5,7 +5,7 @@ from src.backend.get_pars import *
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-static_html_path = os.getenv("STATIC_HTML_PATH") or "../frontend-js/dist"
+static_html_path = os.getenv("STATIC_HTML_PATH") or "../frontend-ts/dist"
 
 app = FastAPI()
 app.add_middleware(

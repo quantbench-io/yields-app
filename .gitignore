@@ -23,11 +23,13 @@ dist-ssr
 *.sln
 *.sw?
 
+**/.DS_Store
 backend/data/csv/*
 data/xml/*
 **/.ipynb_checkpoints
 **/__pycache__
 backend/__pycache__
-frontend-ts/mathjax
-mjx4-page/mathjax
+#frontend-ts/mathjax
+mjx4-page/
+mathjaxBackup/
 frontend-js/mathjax

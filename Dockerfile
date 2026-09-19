@@ -6,11 +6,11 @@ WORKDIR /backend
 RUN uv sync
 
 FROM node:26-alpine AS yields-frontend
-COPY ./frontend-js /frontend-js
-WORKDIR /frontend-js
+COPY ./frontend-ts /frontend-ts
+WORKDIR /frontend-ts
 RUN npm install && npm run build
 
 FROM yields-backend
-COPY --from=yields-frontend /frontend-js/dist /frontend-js/dist
+COPY --from=yields-frontend /frontend-ts/dist /frontend-ts/dist
 WORKDIR /backend
 ENTRYPOINT ["/backend/docker-entrypoint.sh"]

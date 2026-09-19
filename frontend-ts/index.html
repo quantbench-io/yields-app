@@ -15,7 +15,7 @@
     }
 
     #math-notes {
-      visibility: hidden;
+      /*visibility: hidden;*/
     }
   </style>
 
@@ -30,7 +30,7 @@
       },
       output: {
         font: 'mathjax-stix2',
-        fontPath: '/mathjax/mathjax-stix2-font',
+        fontPath: 'mathjax/mathjax-stix2-font',
       },
       // chtml: {matchFontHeight: true} // Automatically scales math size to match surrounding text
       startup: {
@@ -42,12 +42,12 @@
       }
     };
   </script>
-  <script defer src="./mathjax/startup.js"></script>
+  <script defer src="mathjax/startup.js"></script>
 </head>
 
 <body>
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+  <script type="module" src="src/main.tsx"></script>
 
   <!-- ==================================== -->
   <hr>

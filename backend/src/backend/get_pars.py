@@ -1,6 +1,5 @@
-import re, time, json, requests
+import re, time, requests
 import sqlite3 as sql
-import os
 
 from urllib.parse import urlencode
 from src.backend.xml_parse import pars_data_from_xml
@@ -122,7 +121,7 @@ def get_pars(date: str):
     # (no update DB function at the moment)
     else:
         xml_str = get_pars_xml(date, mode="month")
-        pars_data = parse_parse_from_xml(xml_str)
+        pars_data = pars_data_from_xml(xml_str)
 
         return pars_data.get(date, [])
 
@@ -136,7 +135,7 @@ def get_latest_pars():
     date = time.strftime("%Y-%m-%d", time.localtime())
 
     xml_str = get_pars_xml(date, mode="month")
-    pars_data = parse_pars_from_xml(xml_str)
+    pars_data = pars_data_from_xml(xml_str)
 
     latest = max(pars_data.keys())
 

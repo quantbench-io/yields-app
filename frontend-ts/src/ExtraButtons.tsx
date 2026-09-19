@@ -34,7 +34,7 @@ export function TodayButton(
     function handleClick() {
         setDraft("latest");
         setDate("latest");
-        setTitleText("Retrieving...");
+        setTitleText("Retrieving... (can take 20-30 seconds)");
         setParPlots({x:[], y:[]});
         setZeroPlots({x:[], y:[]});
     }

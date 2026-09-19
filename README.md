@@ -1,13 +1,23 @@
 # yields-app-js
 
-—-
+A simple web-page that uses the published *par-yields* of (U.S.) Treasury securities to "bootstrap" the *yield-curve* of monthly *zero-rates* (that is, to price *zero-coupon bonds*) for a range of maturities. 
 
-You can build and start the container with
+The backend is a Python FastAPI server that pulls and processes daily Treasury yield curve data, either fresh from `TreasuryDirect.gov`'s yield curve XML feeds, or from the SQLite3 database `/backend/data/par-yields-all.db`. The frontend (in `frontend-ts`) plots the interpolated yield curve, and allows users to select and save the computed curve data for historical dates. The app's main page also documents the necessary definitions and math used in our computations.
 
+The entire app may be built and started in a Docker container using
+```sh
+misc/dockerscript.sh
 ```
-./dockerscript.sh
+
+#### Repo Structure
+```
+yields-app/
+├─ backend/
+│  ├─ data/
+│  └─ src/backend/
+├─ frontend-js/ # JS/JSX-only version
+├─ frontend-ts/ # primary frontend
+└─ misc/ 
 ```
 
-The backend reads data from `/backend/data/par_yields_all.db` using SQLite3 unless you use the "Get Latest" button, in which case it pulls the latest month's data and gives whatever the most recent trading day's data is.
-
-I worked on this using Vite+React inside JetBrains Pycharm+Webstorm (for the backend and frontend, resp.). This recreated the graph from the assignment brief, as well as successfully pulled data from TreasuryDirect.gov and the database mentioned (it looks up if it already has the data before trying). 
+<!-- <img style="display: block; margin-left: auto; margin-right: auto; margin-top: 0; margin-bottom: 0;scale: 60%; border: 5px solid #365687; max-width: 800px; max-height:600px"  src='misc/hurdle.png'/> -->

@@ -6,7 +6,7 @@ The backend is a Python FastAPI server that pulls and processes daily Treasury y
 
 The entire app may be built and started in a Docker container using
 ```sh
-misc/dockerscript.sh
+build-start.sh
 ```
 
 #### Repo Structure

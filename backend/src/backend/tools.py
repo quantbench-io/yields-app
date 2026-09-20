@@ -38,7 +38,7 @@ def sharp_interval(a, b, *, step=None, samples=None, out_type='float'):
         assert (A in intv) and (B in intv), "Trouble with endpoints of interval"
         return intv
     elif out_type == 'float' :
-        intv = np.array([float(x.quantize(EPS)) for x in intv])
+        intv = [float(x.quantize(EPS)) for x in intv]
         a = float(A.quantize(EPS))
         b = float(B.quantize(EPS))
         assert (float(a) in intv) and (float(b) in intv), "Trouble with endpoints of interval"
@@ -105,23 +105,46 @@ def interpolate_f(nodes, mode):
 
     return np.vectorize(_f)
 
-def interpolate_C(par_nodes, freq, mode):
-    t_min = par_nodes[0][0];
-    tt_short = sharp_interval(t_min, 1/2, step=1/12) # gets an evenly spaced interval
+def interpolate(nodes, mode, step=1/2):
+    t_min, t_max = nodes[0][0], nodes[-1][0]
+    # tt = sharp_interval(tmin, tmax, step=step)
+    n_samples = int(round((t_max - t_min)/(step))+1)
+    tt = np.linspace(t_min, t_max, n_samples)
+    xx = interpolate_f(nodes, mode)(tt)
 
-    t_max = par_nodes[-1][0];
-    tt_long = sharp_interval(0.5, t_max, step=1/freq)
+    return list(zip(tt, xx))
 
-    tt = [*tt_short[:-1], *tt_long] # [-1] to remove the duplicate 1/2
+
+def interpolate_C(par_nodes, mode="linear"):
+
+    C_short = list(filter(lambda x : x[0] <= 0.5, par_nodes))
+    # t_min = C_short[0][0];
+    CC_short = interpolate(C_short, "linear", step=1/12)
+
+
+    # step=(1/12)
+    # n_samples = int(round((1/2-t_min)/step + 1))
+    # tt_short = np.linspace(t_min, 1/2, n_samples)
+    # tt_short = sharp_interval(t_min, 0.5, step=1/12) # gets an evenly spaced interval
+
+    C_long = list(filter(lambda x : x[0] >= 0.5, par_nodes))
+    CC_long = interpolate(C_long, "linear", step=1/2)
+    # t_max = par_nodes[-1][0];
+    # step=1/freq
+    # n_samples = int(round((t_max-(1/2))/step+1))
+    # tt_long = np.linspace(1/2, t_max, n_samples)
+    # tt_long = sharp_interval(0.5, t_max, step=1/freq)
+
+    # tt = [*tt_short[:-1], *tt_long] # [-1] to remove the duplicate 1/2
 
     # for `interpolate_f` to work properly, we want `tt` and the `par_nodes` to have the same time precision
-    par_nodes = [(round(t, PREC), C) for t, C in par_nodes]
-    assert all(t in tt for t, _ in par_nodes), "t-range `tt` does not match times in rounded-time-`par_nodes`"
+    # par_nodes = [(round(t, PREC), C) for t, C in par_nodes]
+    # assert all(t in tt for t, _ in par_nodes), "t-range `tt` does not match times in rounded-time-`par_nodes`"
 
-    _C = interpolate_f(par_nodes, mode)
-    CC = _C(tt)
+    # _C = interpolate_f(par_nodes, mode)
+    CC = [*CC_short[:-1], CC_long]
 
-    return list(zip(tt, CC))
+    return CC
 
 # ===============================================
 # for "continuous" monthly zero
@@ -130,7 +153,11 @@ def interpolate_monthly_P(P_t, mode):
 
     t_min = nodes_t[0]
     t_max = nodes_t[-1]
-    tt = sharp_interval(t_min, t_max, step=1/12)
+    step=(1/12)
+    n_samples = int(round((t_max-t_min)/step + 1))
+
+    tt = np.linspace(t_min, t_max, n_samples)
+    # tt = sharp_interval(t_min, t_max, step=1/12)
 
     P_t = [(round(t, PREC), p) for t, p in P_t]
 
@@ -193,10 +220,11 @@ def Zm_to_Zc(Zm_t, freq):
 # nice wrapper for the main logic
 def zeros_from_par_nodes(par_nodes, freq=2):
     # percent -> decimals
-    C_nodes = [(round(t, PREC), C/100) for t, C in par_nodes]
+    C_nodes = [(t, C/100) for t, C in par_nodes]
+    # C_nodes = [(float(Decimal(str(t)).quantize(EPS)), C) for t, C in C_nodes] # "sanitize" times to our precision
     nodes_t = [t for t, _ in C_nodes]
 
-    C_t = interpolate_C(C_nodes, freq, mode="linear")
+    C_t = interpolate_C(C_nodes, mode="linear")
     P_bootstrap = bootstrap_P_from_C(C_t, freq)
 
     # making sure that the times for our nodes align with

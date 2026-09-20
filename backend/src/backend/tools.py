@@ -6,9 +6,9 @@ from decimal import Decimal
 # In some of our interpolations we want to avoid float/rounding trouble with the inputs, so we
 # use Python's `decimal.Decimal` class for better precision-control. For our purposes
 # here, rounding to 15 decimal places is fine for now.
-# 10**(-17) * (365*24*60*60) = 3.1536e-10, so ~0.3 nanoseconds.
+# 10**(-16) * (365*24*60*60) = 3.1536e-9, so ~3 nanoseconds.
 
-PREC = 17 # decimal places to round to
+PREC = 16 # decimal places to round to
 EPS = Decimal(str(10**(-PREC))) # "epsilon", our precision cutoff
 
 def sharp_interval(a, b, *, step=None, samples=None, out_type='float'):

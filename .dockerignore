@@ -1,2 +1,10 @@
+.git
+.gitignore
+
+misc
+
 **/.idea
 **/.DS_Store
+**/node_modules
+**/dist
+**/.venv

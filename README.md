@@ -1,4 +1,4 @@
-# yields-app-js
+# yields-app
 
 A simple web-page that uses the published *par-yields* of (U.S.) Treasury securities to "bootstrap" the *yield-curve* of monthly *zero-rates* (that is, to price *zero-coupon bonds*) for a range of maturities. 
 
